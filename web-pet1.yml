@@ -12,9 +12,12 @@ spec:
       labels:
         app: pet1
     spec:
+      imagePullSecrets:
+      - name: azure-registry-key
       containers:
       - name: pet1
-        image: gorerveli2/dockerpets:v68
+        image: gorerveli.azurecr.io/dockerpets:v$DOCKER_BUILD_NUMBER
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
 ---
@@ -28,6 +31,6 @@ spec:
   - port: 5000
     protocol: TCP
     targetPort: 5000
-    nodePort: 30000
+    nodePort: 30001
   selector:
     app: pet1
