@@ -11,4 +11,8 @@ WORKDIR /app
 
 HEALTHCHECK CMD curl --fail http://localhost:5000/health || exit 1
 
+RUN adduser --uid 700 --shell bin/sh --skel /dev/null pets --disabled-password
+
+USER pets
+
 CMD python app.py & python admin.py
