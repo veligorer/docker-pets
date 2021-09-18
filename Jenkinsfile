@@ -28,7 +28,7 @@ pipeline {
                 script {
                         env.DOCKER_BUILD_NUMBER="${BUILD_NUMBER}"
                         sh 'echo ${DOCKER_BUILD_NUMBER}'
-                        sh 'envsubst < ./web-pet1.yml | kubectl apply -f -'
+                        sh 'envsubst < ./web-pet.yml | kubectl apply -f -'
                      
                 }
             }
