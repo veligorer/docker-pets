@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pet1
+  name: pet
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pet1
+      app: pet
   template:
     metadata:
       labels:
-        app: pet1
+        app: pet
     spec:
       imagePullSecrets:
-      - name: azure-registry-key
+      - name: secret-key
       containers:
-      - name: pet1
-        image: gorerveli.azurecr.io/dockerpets:v$DOCKER_BUILD_NUMBER
+      - name: pet
+        image: myregistry.domain.com:5000/dockerpets:v$DOCKER_BUILD_NUMBER
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
@@ -24,13 +24,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pet1
+  name: pet
 spec:
   type: NodePort
   ports:
   - port: 5000
     protocol: TCP
     targetPort: 5000
-    nodePort: 30001
+    nodePort: 30000
   selector:
-    app: pet1
+    app: pet
