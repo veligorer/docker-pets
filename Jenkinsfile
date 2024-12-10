@@ -98,7 +98,7 @@ spec:
         container('k8s') {
         sh '''
         set -e
-        env
+        git config --global --add safe.directory /home/jenkins/agent/workspace/$JOB_NAME
         commitid=$(git log -1 --format=%h)
         echo $commitid
         echo "$registryUrl/book-api:$commitId"
