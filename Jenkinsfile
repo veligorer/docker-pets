@@ -91,7 +91,7 @@ spec:
     stage('Run Docker Things') {
             when {
                 expression {
-                    return env.BRANCH_NAME == 'master' && !env.TAG_NAME
+                    return env.BRANCH_NAME == 'master'
                 }
             }
       steps {
@@ -117,7 +117,7 @@ spec:
     stage('Dev Deployment') {
             when {
                 expression {
-                    return env.BRANCH_NAME == 'master' && !env.TAG_NAME
+                    return env.BRANCH_NAME == 'master'
                 }
             }
       steps {
@@ -136,7 +136,7 @@ spec:
     stage('Prod Deployment') {
             when {
                 expression {
-                    return env.BRANCH_NAME == 'master' && env.TAG_NAME
+                    return env.BRANCH_NAME == 'master'
                 }
             }
       steps {
