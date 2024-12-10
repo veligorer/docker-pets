@@ -75,9 +75,10 @@ spec:
       steps {
         sh '''
             set -e
+            env
             ls -arlt
-            cd docker-pets
             commitid=$(git log -1 --format=%h)
+            echo $commitid
             docker build -t $registryUrl/docker-pet:latest -t $registryUrl/docker-pet:$commitid .
             docker images 
             echo "**************"
@@ -88,6 +89,21 @@ spec:
             docker push $registryUrl/docker-pet:$commitid
             
         '''
+      }
+    }
+    stage('k8s') {
+      steps {
+        container('k8s') {
+        sh '''
+        set -e
+        env
+        commitid=$(git log -1 --format=%h)
+        echo $commitid
+        echo "$registryUrl/book-api:$commitId"
+        env | grep -i commit
+        kubectl set image deployment/book-api main=$registryUrl/book-api:$commitId -n default
+        '''
+        }
       }
     }
   }
