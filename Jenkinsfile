@@ -77,6 +77,8 @@ spec:
             set -e
             env
             ls -arlt
+            echo "/home/jenkins/agent/workspace/$JOB_NAME"
+            git config --global --add safe.directory /home/jenkins/agent/workspace/$JOB_NAME
             commitid=$(git log -1 --format=%h)
             echo $commitid
             docker build -t $registryUrl/docker-pet:latest -t $registryUrl/docker-pet:$commitid .
