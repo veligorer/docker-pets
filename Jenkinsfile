@@ -12,12 +12,29 @@ metadata:
   labels:
     app: jenkins
 spec:
+  serviceAccountName: k8s-agent-sa
   containers:
     - name: k8s
       image: alpine/k8s:1.29.11
       command:
         - /bin/cat
       tty: true
+      env:
+        - name: registryUser
+          valueFrom:
+            secretKeyRef:
+              name: registry
+              key: User
+        - name: registryPassword
+          valueFrom:
+            secretKeyRef:
+              name: registry
+              key: Password
+        - name: registryUrl
+          valueFrom:
+            secretKeyRef:
+              name: registry
+              key: Url
     - name: docker
       image: docker:latest
       command:
