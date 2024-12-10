@@ -116,10 +116,9 @@ spec:
         sh '''
         set -e
         git config --global --add safe.directory /home/jenkins/agent/workspace/$JOB_NAME
-        commitid=$(git log -1 --format=%h)
-        echo $commitid
+        commitId=$(git log -1 --format=%h)
+        echo $commitId
         echo "$registryUrl/book-api:$commitId"
-        env | grep -i commit
         kubectl set image deployment/book-api main=$registryUrl/book-api:$commitId -n default
         '''
         }
