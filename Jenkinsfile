@@ -89,13 +89,17 @@ spec:
   }
   stages {
     stage('Run Docker Things') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'master' && !env.TAG_NAME
+                }
+            }
       steps {
         sh '''
             set -e
             env
             ls -arlt
-            echo "/home/jenkins/agent/workspace/$JOB_NAME"
-            git config --global --add safe.directory /home/jenkins/agent/workspace/$JOB_NAME
+            git config --global --add safe.directory $PWD
             commitid=$(git log -1 --format=%h)
             echo $commitid
             docker build -t $registryUrl/docker-pet:latest -t $registryUrl/docker-pet:$commitid .
@@ -110,12 +114,50 @@ spec:
         '''
       }
     }
-    stage('k8s') {
+    stage('Dev Deployment') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'master' && !env.TAG_NAME
+                }
+            }
       steps {
         container('k8s') {
         sh '''
         set -e
-        git config --global --add safe.directory /home/jenkins/agent/workspace/$JOB_NAME
+        git config --global --add safe.directory $PWD
+        commitId=$(git log -1 --format=%h)
+        echo $commitId
+        echo "$registryUrl/book-api:$commitId"
+        kubectl set image deployment/book-api main=$registryUrl/book-api:$commitId -n default
+        '''
+        }
+      }
+    }
+    stage('Prod Deployment') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'master' && env.TAG_NAME
+                }
+            }
+      steps {
+        container('docker') {
+        sh '''
+        set -e
+        git config --global --add safe.directory $PWD
+        commitId=$(git log -1 --format=%h)
+        echo $commitId
+        echo "$registryUrl/book-api:$commitId"
+        echo "Docker login"
+        echo $registryPassword | docker login -u $registryUser $registryUrl --password-stdin
+        docker pull $registryUrl/book-api:$commitId
+        docker tag $registryUrl/book-api:$commitId $registryUrl/book-api:latest-release
+        docker push $registryUrl/book-api:latest-release
+        '''
+        }
+        container('k8s') {
+        sh '''
+        set -e
+        git config --global --add safe.directory $PWD
         commitId=$(git log -1 --format=%h)
         echo $commitId
         echo "$registryUrl/book-api:$commitId"
