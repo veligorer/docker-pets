@@ -89,11 +89,11 @@ spec:
   }
   stages {
     stage('Run Docker Things') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'master'
-                }
+        when {
+            expression {
+                return env.GIT_BRANCH ==~ '.*/master'
             }
+        } 
       steps {
         sh '''
             set -e
@@ -115,11 +115,11 @@ spec:
       }
     }
     stage('Dev Deployment') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'master'
-                }
+        when {
+            expression {
+                return env.GIT_BRANCH ==~ '.*/master'
             }
+        } 
       steps {
         container('k8s') {
         sh '''
@@ -134,11 +134,11 @@ spec:
       }
     }
     stage('Prod Deployment') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'master'
-                }
-            }
+    when {
+        expression {
+            return env.GIT_BRANCH ==~ '^refs/tags/v(d+.d+.d+)'
+        }
+    } 
       steps {
         container('docker') {
         sh '''
