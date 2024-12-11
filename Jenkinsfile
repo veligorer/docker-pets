@@ -8,6 +8,11 @@ pipeline {
   }
   stages {
     stage('Run Docker Things') {
+        when {
+            expression {
+                return env.GIT_BRANCH ==~ '.*/master'
+            }
+        } 
       steps {
         container('docker') {
         sh '''
@@ -43,8 +48,8 @@ pipeline {
         git config --global --add safe.directory $PWD
         commitId=$(git log -1 --format=%h)
         echo $commitId
-        echo "$registryUrl/book-api:$commitId"
-        kubectl set image deployment/book-api main=$registryUrl/book-api:$commitId -n default
+        echo "$registryUrl/docker-pet:$commitId"
+        kubectl set image deployment/book-api main=$registryUrl/docker-pet:$commitId -n default
         '''
         }
       }
@@ -52,7 +57,7 @@ pipeline {
     stage('Prod Deployment') {
     when {
         expression {
-            return env.GIT_BRANCH ==~ '^refs/tags/v(d+.d+.d+)'
+            return env.GIT_BRANCH ==~ 'refs/tags/v1.*..*..*'
         }
     } 
       steps {
@@ -62,12 +67,12 @@ pipeline {
         git config --global --add safe.directory $PWD
         commitId=$(git log -1 --format=%h)
         echo $commitId
-        echo "$registryUrl/book-api:$commitId"
+        echo "$registryUrl/docker-pet:$commitId"
         echo "Docker login"
         echo $registryPassword | docker login -u $registryUser $registryUrl --password-stdin
-        docker pull $registryUrl/book-api:$commitId
-        docker tag $registryUrl/book-api:$commitId $registryUrl/book-api:latest-release
-        docker push $registryUrl/book-api:latest-release
+        docker pull $registryUrl/docker-pet:$commitId
+        docker tag $registryUrl/docker-pet:$commitId $registryUrl/docker-pet:latest-release
+        docker push $registryUrl/docker-pet:latest-release
         '''
         }
         container('k8s') {
@@ -76,8 +81,8 @@ pipeline {
         git config --global --add safe.directory $PWD
         commitId=$(git log -1 --format=%h)
         echo $commitId
-        echo "$registryUrl/book-api:$commitId"
-        kubectl set image deployment/book-api main=$registryUrl/book-api:$commitId -n default
+        echo "$registryUrl/docker-pet:$commitId"
+        kubectl set image deployment/book-api main=$registryUrl/docker-pet:$commitId -n default
         '''
         }
       }
