@@ -89,11 +89,6 @@ spec:
   }
   stages {
     stage('Run Docker Things') {
-        when {
-            expression {
-                return env.GIT_BRANCH ==~ '.*/master'
-            }
-        } 
       steps {
         sh '''
             set -e
